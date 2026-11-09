@@ -1,0 +1,5 @@
+category,precision,recall,f1_score,support
+billing,1.0,1.0,1.0,38
+delivery,1.0,1.0,1.0,36
+technical,1.0,1.0,1.0,39
+fraud,1.0,1.0,1.0,34

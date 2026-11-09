@@ -1,0 +1,19 @@
+.venv/
+__pycache__/
+*.py[cod]
+.env
+.vscode/
+
+# Generated datasets and databases
+data/instamart.db
+data/clean/
+data/processed/
+
+# Keep CSV results, exclude runtime artifacts
+outputs/*.joblib
+outputs/*.jsonl
+
+# Runtime checkpoints and archives
+state/*
+!state/READ.md
+run_archives/

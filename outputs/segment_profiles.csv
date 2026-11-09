@@ -1,0 +1,5 @@
+segment_id,customers,avg_recency,avg_frequency,avg_monetary,segment_name,recommended_action
+0,436,28.86,3.77,1057.62,Regular Customers,Use personalised recommendations and cross-selling campaigns.
+1,138,24.12,6.77,7129.7,Premium,"Offer exclusive benefits, early access and loyalty rewards."
+2,419,8.77,19.4,3410.02,Frequent Shoppers,Encourage repeat purchases through subscriptions and bundles.
+3,182,109.04,2.2,685.99,Occasional Shoppers,Use targeted discounts and re-engagement campaigns.
