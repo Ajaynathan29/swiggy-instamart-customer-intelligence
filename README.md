@@ -1,145 +1,159 @@
 # Instamart Customer Intelligence & Support Copilot
 
-An end-to-end Python project combining customer analytics, churn prediction, support-ticket triage, policy-based RAG, and an AI-assisted refund workflow.
+An end-to-end Python project combining customer analytics, lapse prediction, support-ticket triage, policy-based RAG, and an AI-assisted refund workflow.
 
-**Tech stack:** Python, Pandas, NumPy, Scikit-learn, SQLite, TF-IDF, RAG, and a mock LLM.
+**Tech stack:** Python, Pandas, NumPy, Scikit-learn, SQLite, TF-IDF, and a mock LLM.
 
 ## Overview
 
 | Part | Focus |
-
 |---|---|
-
-| A | Data cleaning, quality analysis, and SQLite database |
-
+| A | Data cleaning, quality analysis, SQL, and SQLite |
 | B | Customer segmentation and lapse prediction |
-
 | C | PII redaction and support-ticket classification |
-
 | D | Policy RAG and refund-support agent |
+
+This is an independent portfolio project inspired by an Instamart-style business scenario. It is not affiliated with Swiggy.
 
 ## Reproduce
 
-Tested with Python 3.14 on Windows.
+**Requirements:** Python 3.11+, SQLite 3.25+, and Windows PowerShell.
 
 1. Create a virtual environment:
 
    ```powershell
-
    python -m venv .venv
-
    ```
 
 2. Activate it:
 
    ```powershell
-
    .\.venv\Scripts\Activate.ps1
-
    ```
 
 3. Install dependencies:
 
    ```powershell
-
    python -m pip install --upgrade pip
-
    pip install -r requirements.txt
-
    ```
 
-4. Run the complete pipeline:
+4. Generate synthetic datasets and policy files:
 
    ```powershell
-
-   python run_project.py
-
+   python generate_data.py
    ```
 
-The runner executes Parts A–D and performs final acceptance checks.
+5. Run the complete pipeline:
 
-**Latest run: 48/48 acceptance checks passed.**
+   ```powershell
+   python run_project.py
+   ```
 
-## Part A — Data Preparation
+The runner executes Parts A–D, runs safety and recovery tests, and validates generated outputs.
+
+**Latest validation: 50/50 acceptance checks passed.**
+
+## Part A — Data Preparation and SQL Analysis
 
 - Audited raw customer, order, product, and ticket datasets.
+- Removed duplicates and handled missing, invalid, and inconsistent values.
+- Created cleaned CSV datasets and a SQLite database.
+- Added relational constraints, indexes, and a completed-orders view.
+- Developed seven SQL queries using joins, aggregations, subqueries, CTEs, and window functions.
 
-- Removed duplicates and handled missing or invalid values.
-
-- Created cleaned datasets and a SQLite database.
-
-- Added relational tables, constraints, indexes, and a completed-orders view.
-
-**Result:** 12,309 unique orders, 1,200 customers, and 40 products.
+**Results:**
+- Raw orders: 13,084; exact duplicate rows removed: 119.
+- Final unique orders: 12,309.
+- Customers: 1,200; products: 40.
+- All seven SQL queries executed successfully.
+- SQL result counts: 30, 30, 11, 25, 550, 1,175, and 183 rows.
 
 ## Part B — Customer Intelligence
 
 - Built RFM-based customer features.
-
 - Applied K-Means clustering and identified four customer segments.
-
-- Trained and evaluated Logistic Regression and Random Forest lapse models.
-
-- Compared thresholds and analyzed feature importance.
+- Trained Logistic Regression and Random Forest lapse-prediction models.
+- Evaluated thresholds, feature importance, and model performance.
 
 **Results:**
+- 1,175 customers included in RFM segmentation.
+- Four segments: Regular Customers, Premium, Frequent Shoppers, and Occasional Shoppers.
+- Final model dataset: 1,156 customers.
+- Training rows: 924; test rows: 232.
+- Random Forest test ROC-AUC: **0.7808**.
+- At threshold 0.50: precision **0.6591**, recall **0.6517**, and F1-score **0.6554**.
+- Top Random Forest features: frequency (**0.2796**), monetary value (**0.2712**), and recency (**0.1151**).
 
-- Four customer segments identified.
-
-- Random Forest test ROC-AUC: 0.7808.
-
-- At threshold 0.50: F1-score 0.6554 and recall 0.6517.
+**Evaluation note:** The premium retention list is illustrative. Its premium flag uses full-window RFM information and is not a leakage-free prospective evaluation.
 
 ## Part C — Support Ticket Intelligence
 
-- Redacted email addresses, mobile numbers, and order IDs.
-
+- Redacted email addresses, Indian mobile numbers, and order IDs.
 - Classified tickets into delivery, billing, fraud, and technical categories.
-
-- Added retry handling, invalid-response handling, and keyword fallback.
-
-- Evaluated classification quality and token-budget handling.
+- Implemented retry handling, invalid-response handling, and keyword fallback.
+- Added input guardrails, priority assignment, and routing queues.
+- Evaluated classification quality and token usage.
 
 **Results:**
-
-- 164 tickets processed.
-
+- 164 tickets processed: 147 successful, 9 invalid, and 8 skipped.
 - 278 PII occurrences detected and redacted.
+- Successful classifications: 147/147 correct.
+- Classification coverage: **94.23%**.
+- Total attempts: 175.
+- Total token usage: 28,432.
+- Token-budget demonstration: 2,000-token limit, 10 tickets processed, 146 rejected.
 
-- 94.23% classification coverage.
+The 100% accuracy applies only to successfully classified tickets. Results use synthetic data and a deterministic mock LLM.
 
-- 100% accuracy among successfully classified tickets.
+## Part D — Policy RAG and Refund Agent
 
-## Part D — RAG and Refund Agent
+- Built a TF-IDF and cosine-similarity retrieval pipeline over five policy documents.
+- Compared chunking strategies with and without 10-word overlap.
+- Implemented order lookup, policy search, refund calculation, refund issuance, and human escalation.
+- Added token, timeout, and iteration limits.
+- Implemented checkpointing and resume support.
 
-- Built a policy retrieval pipeline using TF-IDF and cosine similarity.
+**RAG evaluation:**
+- Five policy documents produced 15 chunks.
+- With 10-word overlap: 12/12 answerable questions retrieved the required policy information.
+- Without overlap: 12/12 document retrieval, but fact coverage fell to 10/12.
+- Unsupported-question fallback: 2/2.
 
-- Compared chunking strategies with and without overlap.
+**Seven agent scenarios:**
 
-- Implemented refund calculation, policy lookup, and human escalation tools.
+| Scenario | Outcome | Model calls | Tokens |
+|---|---|---:|---:|
+| S1 | REFUND — INR 128.25 | 5 | 1,612 |
+| S2 | REFUND — INR 135.00 | 5 | 1,612 |
+| S3 | ESCALATE — INR 1,999.00 | 5 | 1,599 |
+| S4 | DENIED | 4 | 1,177 |
+| S5 | DENIED | 3 | 766 |
+| S6 | NOT_FOUND | 2 | 358 |
+| S7 | FALLBACK_MAX_ITERATIONS | 6 | 3,858 |
 
-- Added safety limits, checkpointing, and resume testing.
+**Safety tests:**
 
-**Results:**
+| Test | Result |
+|---|---|
+| Token limit | `FALLBACK_TOKEN_LIMIT` — passed |
+| Timeout | `FALLBACK_TIMEOUT` — passed |
+| Maximum iterations | `FALLBACK_MAX_ITERATIONS` — passed |
 
-- 15 policy chunks across five policy documents.
+**Checkpoint and resume:** A simulated crash after two tools was recovered successfully. The agent resumed without repeating completed tools and issued a refund of INR 128.25.
 
-- 12/12 answerable questions retrieved the required policy information with overlapping chunks.
-
-- Seven refund-agent scenarios tested.
-
-- Safety and checkpoint/resume tests passed.
+Tools executed in order:
+1. `get_order`
+2. `search_policy`
+3. `calculate_refund`
+4. `issue_refund`
 
 ## Limitations and Next Steps
 
-- Uses synthetic datasets and a deterministic mock LLM; results do not represent production performance.
-
-- RAG and classification require evaluation against real customer conversations.
-
+- Uses synthetic datasets and a deterministic mock LLM, not real customer conversations.
+- Model and classification results require evaluation on representative real-world data.
 - Refund actions use a local demonstration ledger, not a live payment provider.
+- The retention list is illustrative and not a leakage-free prospective evaluation.
+- Checkpointing supports recovery but does not guarantee transactional exactly-once execution.
 
-- The premium retention list is illustrative and is not a leakage-free model evaluation.
-
-- Checkpointing demonstrates recovery but does not guarantee transactional exactly-once execution.
-
-**Future improvements:** Integrate a production LLM, real support APIs, payment-provider integrations, and model-performance monitoring.
+**Future improvements:** Evaluate with real-world data, integrate production support and payment APIs, and add model-performance monitoring.

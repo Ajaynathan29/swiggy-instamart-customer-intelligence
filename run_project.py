@@ -414,12 +414,22 @@ def run_acceptance_checks():
 
     required_files = [
 
+        # Clean datasets
+
         "data/clean/customers.csv",
         "data/clean/orders.csv",
         "data/clean/products.csv",
 
+        # SQLite databases
+
         "data/instamart.db",
         "data/processed/instamart.db",
+
+        # SQL submission
+
+        "sql/queries.sql",
+
+        # Intermediate processed datasets
 
         "data/processed/customer_features.csv",
         "data/processed/customer_segments.csv",
@@ -427,13 +437,19 @@ def run_acceptance_checks():
         "data/processed/tickets_redacted.csv",
         "data/processed/tickets_triaged.csv",
 
+        # Part B outputs
+
         "outputs/customer_segments.csv",
         "outputs/lapse_model.joblib",
-
         "outputs/retention_list.csv",
+
+        # Part C outputs
 
         "outputs/triage_results.csv",
         "outputs/triage_metrics.csv",
+        "outputs/triage_budget_demo.csv",
+
+        # Part D outputs
 
         "outputs/agent_runs.jsonl",
         "outputs/refund_ledger.jsonl"
@@ -466,6 +482,7 @@ def run_acceptance_checks():
         "outputs/triage_results.csv",
         164
     )
+
 
     # Part D checks
 

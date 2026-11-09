@@ -1,19 +1,33 @@
-.venv/
+﻿.venv/
 __pycache__/
 *.py[cod]
 .env
 .vscode/
 
-# Generated datasets and databases
-data/instamart.db
-data/clean/
+# Generated intermediate datasets
 data/processed/
+data/raw/
 
-# Keep CSV results, exclude runtime artifacts
+# Required cleaned datasets
+data/clean/
+!data/clean/
+!data/clean/*.csv
+
+# Required SQLite database
+data/instamart.db
+!data/instamart.db
+
+# Required model and agent outputs
 outputs/*.joblib
-outputs/*.jsonl
+!outputs/lapse_model.joblib
 
-# Runtime checkpoints and archives
+outputs/*.jsonl
+!outputs/agent_runs.jsonl
+!outputs/refund_ledger.jsonl
+
+# Runtime checkpoints
 state/*
 !state/READ.md
+
+# Local run archives
 run_archives/
